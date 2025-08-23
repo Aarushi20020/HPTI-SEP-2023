@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pie Chart Spacing Examples</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .chart-container {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .chart-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pie Chart Spacing Examples</h1>
+
+    <!-- Chart.js Example -->
+    <div class="chart-container">
+        <div class="chart-title">Chart.js - With Spacing</div>
+        <canvas id="chartjsPie" width="300" height="300"></canvas>
+    </div>
+
+    <!-- D3.js Example -->
+    <div class="chart-container">
+        <div class="chart-title">D3.js - With Spacing</div>
+        <svg id="d3Pie" width="300" height="300"></svg>
+    </div>
+
+    <!-- CSS/SVG Manual Example -->
+    <div class="chart-container">
+        <div class="chart-title">Manual SVG - With Spacing</div>
+        <svg width="300" height="300" id="manualPie">
+            <!-- Principal segment (82.4%) -->
+            <g transform="translate(150,150)">
+                <path d="M 0,-100 A 100,100 0 1,1 -95.11,-30.9 L -85.6,-27.81 A 90,90 0 1,0 0,-90 Z" 
+                      fill="#FFC107" 
+                      transform="rotate(-2)"/>
+                <text x="30" y="-60" fill="#666" font-size="14">Principal: 82.4%</text>
+            </g>
+            
+            <!-- Interest segment (17.6%) -->
+            <g transform="translate(150,150)">
+                <path d="M -95.11,-30.9 A 100,100 0 0,1 -95.11,-30.9 L -85.6,-27.81 A 90,90 0 0,0 -85.6,-27.81 Z" 
+                      fill="#000" 
+                      transform="rotate(2)"/>
+                <text x="-120" y="20" fill="#666" font-size="14">Interest: 17.6%</text>
+            </g>
+        </svg>
+    </div>
+
+    <script>
+        // Chart.js Implementation with spacing
+        const ctx = document.getElementById('chartjsPie').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Principal', 'Interest'],
+                datasets: [{
+                    data: [82.4, 17.6],
+                    backgroundColor: ['#FFC107', '#000000'],
+                    borderWidth: 5,  // This creates spacing between segments
+                    borderColor: '#ffffff'  // White border creates visual separation
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                elements: {
+                    arc: {
+                        borderAlign: 'inner'  // Aligns border to inside of segments
+                    }
+                }
+            }
+        });
+
+        // D3.js Implementation with spacing
+        const width = 300;
+        const height = 300;
+        const radius = Math.min(width, height) / 2 - 10;
+
+        const svg = d3.select("#d3Pie")
+            .append("g")
+            .attr("transform", `translate(${width/2},${height/2})`);
+
+        const data = [
+            {label: "Principal", value: 82.4, color: "#FFC107"},
+            {label: "Interest", value: 17.6, color: "#000000"}
+        ];
+
+        const pie = d3.pie()
+            .value(d => d.value)
+            .padAngle(0.05);  // This adds spacing between segments
+
+        const arc = d3.arc()
+            .innerRadius(0)
+            .outerRadius(radius);
+
+        const arcs = svg.selectAll("arc")
+            .data(pie(data))
+            .enter()
+            .append("g");
+
+        arcs.append("path")
+            .attr("d", arc)
+            .attr("fill", d => d.data.color);
+
+        arcs.append("text")
+            .attr("transform", d => `translate(${arc.centroid(d)})`)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "12px")
+            .attr("fill", "#666")
+            .text(d => `${d.data.label}: ${d.data.value}%`);
+    </script>
+</body>
+</html>
